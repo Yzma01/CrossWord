@@ -4,42 +4,91 @@ matriz([[1, 2, 3],
         [4, 5, 6],
         [7, 8, 9]]).
 
+h_hints(
+    ["1. No es grande ni pequeno",
+     "2. Dia de la semana",
+     "3. Indiferencia, desgracia, desprecio",
+     "4. Parte de un libro",
+     "5. Escucha un programa de radio"]
+).
+
+v_hints(
+    ["6. Lugar para ir a comprar",
+     "7. Juguete",
+     "8. Derretido, fusionado",
+     "9. Dos, tres, cuatro, cinco",
+     "10. Se hace mas joven"]
+).
 
 % Interfaz principal del juego
 start :-
-    % Crear la ventana principal
     new(Window, dialog('Juego de Crucigrama')),
-     send(Window, size, size(350, 600)),
-    % Crear un contenedor horizontal para los textos
-    send(Window, append, new(HBox, dialog_group(horizontal))),
-    % Agregar el primer texto
-    send(HBox, append, new(_, text('Crucigrama 3x3'))),
-    % Agregar el segundo texto al lado
-    send(HBox, append, new(_, text('1. Isma Pelon'))),
-    % Crear el botón de verificación
-    % Abrir la ventana
-
-    send(Window, append, new(VBox, dialog_group(vertical))),
-    % Agregar el primer texto
-    send(VBox, append, new(_, text('Crucigsdsacdsarama 3x3'))),
-    % Agregar el segundo texto al lado
-    send(VBox, append, new(_, text('1. dIsma Pelon'))),
-
-    % Llamar a la función que agregará los campos de text dinámicamente
+    send(Window, size, size(600, 600)),  
     
-    agregar_textos(HBox, 1),  % Por ejemplo, agregar 5 campos de texto
+    set_horizontal_container(Window),
+    set_vertical_container(Window),
 
+
+     send(Window, append, new(HInputs, dialog_group(inputsH))),
+    add_inputH(HInputs, 1, 50),  
+    send(Window, append, new(VInputs, dialog_group(inputsV)), right),
+    add_inputV(VInputs,6,50),
 
     send(Window, open).
 
-% Función recursiva para agregar los campos de texto
-agregar_textos(_, 6).  % Caso base: cuando se ha agregado el número de elementos deseado
+set_horizontal_container(Window) :-
+    send(Window, append, new(HBox, dialog_group(horizontal))),
+    h_hints(Hints),
+    add_text_to_container(HBox, Hints).
 
-agregar_textos(Window, N) :-
+set_vertical_container(Window):-
+    send(Window, append, new(VBox, dialog_group(vertical)), right),
+    v_hints(HintsV),
+    add_text_to_container(VBox, HintsV).
+
+add_text_to_container(_, []). % Caso base, lista vacía
+add_text_to_container(Contenedor, [Texto | Resto]) :-
+    send(Contenedor, append, new(_, text(Texto))),  
+    add_text_to_container(Contenedor, Resto).
+
+% Añade los inputs del las opciones horizontal
+add_inputH(, 6,). % Caso base, N == 6
+add_inputH(HInputs, N, PosX) :-
     N < 6,
-    new(NameField, text_item(N)),  % Crear el campo de texto
-    send(NameField, width, 10),  % Cambiar el ancho del campo de texto
-    send(NameField, height, 30),  % Cambiar la altura del campo de texto
-    send(Window, append, NameField), 
+    new(NameField, text_item(N)),  
+    send(NameField, width, 10),  
+    send(HInputs, append, NameField),
+
+    new(GetButton, button('Obtener', 
+        message(@prolog, obtener_info, NameField))), 
+    send(GetButton, position, point(PosX + 10, 100)),  
+    send(HInputs, append, GetButton, right),
+
     N1 is N + 1,
-    agregar_textos(Window, N1).  % Llamada recursiva para agregar el siguiente campo
+    NewPosX is PosX + 120,
+
+    add_inputH(HInputs, N1, NewPosX).
+
+% Añade los inputs del las opciones vertica
+add_inputV(,11,). % Caso base, N == 6
+add_inputV(VInputs, N, PosX) :-
+    N < 11,
+    new(NameField, text_item(N)),  
+    send(NameField, width, 10),  
+    send(VInputs, append, NameField),
+
+    new(GetButton, button('Obtener', 
+        message(@prolog, obtener_info, NameField))), 
+    send(GetButton, position, point(PosX + 10, 100)),  
+    send(VInputs, append, GetButton, right),
+
+    N1 is N + 1,
+    NewPosX is PosX + 120,
+    add_inputV(VInputs, N1, NewPosX).
+
+
+
+% Acción para obtener la información de un campo de texto
+obtener_info(NameField) :-
+    get(NameField, selection, Selection),  % Obtener el texto seleccionado o ingresado
+    format('Información del campo: ~w\n', [Selection]).
