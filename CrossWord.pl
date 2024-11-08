@@ -52,7 +52,7 @@ add_text_to_container(Contenedor, [Texto | Resto]) :-
     add_text_to_container(Contenedor, Resto).
 
 % Añade los inputs del las opciones horizontal
-add_inputH(, 6,). % Caso base, N == 6
+add_inputH(_, 6,_). % Caso base, N == 6
 add_inputH(HInputs, N, PosX) :-
     N < 6,
     new(NameField, text_item(N)),  
@@ -70,7 +70,7 @@ add_inputH(HInputs, N, PosX) :-
     add_inputH(HInputs, N1, NewPosX).
 
 % Añade los inputs del las opciones vertica
-add_inputV(,11,). % Caso base, N == 6
+add_inputV(_,11,_). % Caso base, N == 6
 add_inputV(VInputs, N, PosX) :-
     N < 11,
     new(NameField, text_item(N)),  
@@ -92,3 +92,9 @@ add_inputV(VInputs, N, PosX) :-
 obtener_info(NameField) :-
     get(NameField, selection, Selection),  % Obtener el texto seleccionado o ingresado
     format('Información del campo: ~w\n', [Selection]).
+
+
+
+
+
+
