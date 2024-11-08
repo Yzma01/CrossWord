@@ -98,25 +98,3 @@ obtener_info(NameField) :-
 
 
 
-%     add_input(_, 6, _). % Caso base, N == 6
-% add_input(Window, N, PosX) :-
-%     N < 6,
-%     new(NameField, text_item(N)),  
-%     send(NameField, width, 10),  
-%     send(NameField, position, point(PosX, 100)),  
-%     send(Window, append, NameField),
-    
-%     % Crear un botón junto al campo de texto
-%     new(GetButton, button('Obtener', 
-%         message(@prolog, obtener_info, NameField))),  % Llamar a la acción al presionar el botón
-%     send(GetButton, position, point(PosX + 10, 100)),  % Posicionar el botón junto al campo de texto
-%     send(Window, append, GetButton, right),
-    
-%     N1 is N + 1,
-%     NewPosX is PosX + 120,  % Espacio adicional para los botones
-%     add_input(Window, N1, NewPosX).
-
-% % Acción para obtener la información de un campo de texto
-% obtener_info(NameField) :-
-%     get(NameField, selection, Selection),  % Obtener el texto seleccionado o ingresado
-%     format('Información del campo: ~w\n', [Selection]).
