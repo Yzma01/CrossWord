@@ -1,5 +1,7 @@
 :- use_module(library(pce)).
 
+:- dynamic cell/1.  % Declaración dinámica para almacenar las celdas
+
 matriz([[1, 2, 3],
         [4, 5, 6],
         [7, 8, 9]]).
@@ -25,9 +27,6 @@ start :-
     new(Window, dialog('Juego de Crucigrama')),
     send(Window, size, size(720, 720)),
 
-    set_horizontal_container(Window),
-    set_vertical_container(Window),
-
     % Agregar el contenedor para el crucigrama
     send(Window, append, new(CrossWord, dialog_group(crossWord))),
     send(CrossWord, width, 640),
@@ -35,23 +34,22 @@ start :-
 
     % Crear la matriz del crucigrama
     create_crossWord(CrossWord),
-    
 
-    send(Window, append, new(HInputs, dialog_group(inputsH))),
-    add_inputH(HInputs, 1, 50),
-    send(Window, append, new(VInputs, dialog_group(inputsV)), right),
-    add_inputV(VInputs, 6, 50),
+    set_buttons(Window),
+    set_horizontal_container(Window),
+    set_vertical_container(Window),
 
     send(Window, open).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 set_horizontal_container(Window) :-
     send(Window, append, new(HBox, dialog_group(horizontal))),
+    send(Window, display, HBox, point(50, 550)),
     h_hints(Hints),
     add_text_to_container(HBox, Hints).
 
 set_vertical_container(Window) :-
-    send(Window, append, new(VBox, dialog_group(vertical)), right),
+    send(Window, append, new(VBox, dialog_group(vertical))),
+    send(Window, display, VBox, point(350, 550)),
     v_hints(HintsV),
     add_text_to_container(VBox, HintsV).
 
@@ -61,46 +59,27 @@ add_text_to_container(Contenedor, [Texto | Resto]) :-
     add_text_to_container(Contenedor, Resto).
 
 % Añade los inputs del las opciones horizontal
-add_inputH(_, 6, _). % Caso base, N == 6
-add_inputH(HInputs, N, PosX) :-
-    N < 6,
-    new(NameField, text_item(N)),
-    send(NameField, width, 10),
-    send(HInputs, append, NameField),
+set_buttons(Window) :-
+    new(VerifyButton, button('Verificar', message(@prolog, verificar))),
+    send(VerifyButton, width, 100),
+    send(VerifyButton, height, 50),
+    send(VerifyButton, position, point(150, 600)),
+    send(Window, append, VerifyButton),
 
-    new(GetButton, button('Obtener',
-        message(@prolog, obtener_info, NameField))),
-    send(GetButton, position, point(PosX + 10, 100)),
-    send(HInputs, append, GetButton, right),
+    new(RetryButton, button('Reiniciar', message(@prolog, reset_cell))),
+    send(RetryButton, width, 100),
+    send(RetryButton, height, 50),
+    send(RetryButton, position, point(270, 600)),
+    send(Window, append, RetryButton),
 
-    N1 is N + 1,
-    NewPosX is PosX + 120,
-    add_inputH(HInputs, N1, NewPosX).
-
-% Añade los inputs del las opciones vertical
-add_inputV(_, 11, _). % Caso base, N == 11
-add_inputV(VInputs, N, PosX) :-
-    N < 11,
-    new(NameField, text_item(N)),
-    send(NameField, width, 10),
-    send(VInputs, append, NameField),
-
-    new(GetButton, button('Obtener',
-        message(@prolog, obtener_info, NameField))),
-    send(GetButton, position, point(PosX + 10, 100)),
-    send(VInputs, append, GetButton, right),
-
-    N1 is N + 1,
-    NewPosX is PosX + 120,
-    add_inputV(VInputs, N1, NewPosX).
+    new(CloseButton, button('Cerrar', message(Window, destroy))),
+    send(CloseButton, width, 100),
+    send(CloseButton, height, 50),
+    send(CloseButton, position, point(390, 600)),
+    send(Window, append, CloseButton).
 
 
-% Acción para obtener la información de un campo de texto
-obtener_info(NameField) :-
-    get(NameField, selection, Selection),
-    format('Información del campo: ~w\n', [Selection]).
-
-
+% Crea el tablero del crucigrama
 create_crossWord(CrossWord) :-
         %1
         add_label(CrossWord, '1', 190, 55),
@@ -183,25 +162,29 @@ create_crossWord(CrossWord) :-
         create_cell(CrossWord,200,330),
         create_cell(CrossWord,240,330).
 
-
-
 % Predicado para agregar un label en una posición dada
 add_label(Window, Text, PosX, PosY) :-
     new(Label, label(nombre_label, Text)),
     send(Window, append, Label),
-    send(Window, display,Label, point(PosX, PosY)).
+    send(Window, display, Label, point(PosX, PosY)).
 
-
-
-
-        
-
-
-create_cell(CrossWord, X,Y) :-
+% Crea una cellda en una posición dada y la almacena
+create_cell(CrossWord, X, Y) :-
     new(Cell, text_item('')),
-        send(Cell, length, 1),  
-        send(Cell, width, 3),
-        send(CrossWord, append, Cell),
-        send(CrossWord, display,Cell, point(X, Y)).
+    send(Cell, length, 1),
+    send(Cell, width, 3),
+    send(CrossWord, append, Cell),
+    send(CrossWord, display, Cell, point(X, Y)),
+    assertz(cell(Cell)).  % Agrega la celda a la lista dinámica
 
+reset_cell:-
+    forall(cell(Cell),(
+        send(Cell, selection, '')
+    )).
 
+% Predicado para verificar el contenido de cada celda
+verificar :-
+    forall(cell(Cell), (
+        get(Cell, selection, Value),
+        format('Valor de la celda: ~w~n', [Value])
+    )).
