@@ -4,7 +4,7 @@
 
 % Lista de Palabras
 palabras(['M', 'E', 'D', 'I', 'A', 'N', 
-'O', 'U', 'N', 'E', 'C', 'A', 'U', 'M', 'E', 
+'O', 'A', 'D', 'E', 'R', 'A', 'U', 'M', 'E', 
 'R', 'O', 'S', 'D', 'E', 'D', 'E', 'N', 'F', 
 'U', 'N', 'I', 'D', 'O', 'Y', 'E', 'N', 'T', 
 'E', 'R', 'E', 'J', 'U', 'V', 'E', 'E', 'C', 
@@ -25,7 +25,7 @@ h_hints(
 
 v_hints(
     ["6. Lugar para ir a comprar",
-     "7. Juguete",
+     "7. Material del arbol",
      "8. Derretido, fusionado",
      "9. Dos, tres, cuatro, cinco",
      "10. Se hace mas joven"]
