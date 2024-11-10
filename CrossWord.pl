@@ -99,7 +99,6 @@ create_crossWord(CrossWord) :-
         create_cell(CrossWord,200,250),
         %9
         add_label(CrossWord, '9', 420, 30),
-        create_cell(CrossWord,400,50),
         create_cell(CrossWord,400,90),
         create_cell(CrossWord,400,130),
         create_cell(CrossWord,400,170),
@@ -144,7 +143,6 @@ create_crossWord(CrossWord) :-
         create_cell(CrossWord,80,170),
         create_cell(CrossWord,120,170),
         create_cell(CrossWord,160,170),
-        create_cell(CrossWord,200,170),
         create_cell(CrossWord,240,170),
         %6
         add_label(CrossWord, '6', 140, 110),
