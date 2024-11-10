@@ -2,6 +2,15 @@
 
 :- dynamic cell/1.  % Declaración dinámica para almacenar las celdas
 
+% Lista de Palabras
+palabras(['M', 'E', 'D', 'I', 'A', 'N', 
+'O', 'U', 'N', 'E', 'C', 'A', 'U', 'M', 'E', 
+'R', 'O', 'S', 'D', 'E', 'D', 'E', 'N', 'F', 
+'U', 'N', 'I', 'D', 'O', 'Y', 'E', 'N', 'T', 
+'E', 'R', 'E', 'J', 'U', 'V', 'E', 'E', 'C', 
+'J', 'U', 'E', 'V', 'S', 'M', 'R', 'C', 'A', 
+'D', 'O', 'I', 'N', 'I', 'C', 'E']).
+
 matriz([[1, 2, 3],
         [4, 5, 6],
         [7, 8, 9]]).
@@ -180,9 +189,34 @@ reset_cell:-
         send(Cell, selection, '')
     )).
 
-% Predicado para verificar el contenido de cada celda
+get_all_values(Values) :-
+    findall(Value, (
+        cell(Cell),
+        get(Cell, selection, Value)
+    ), Values).
+
+% Predicado para verificar si el juego esta ganado
 verificar :-
-    forall(cell(Cell), (
-        get(Cell, selection, Value),
-        format('Valor de la celda: ~w~n', [Value])
-    )).
+    get_all_values(Values),
+    writeln('Values:'), writeln(Values),
+
+    palabras(WordList),
+    writeln('WordList:'), writeln(WordList),
+    
+    (compare_lists(Values, WordList) ->
+        new(D, dialog('Felicitaciones!!!')),
+        send(D, append, label(mensaje, 'Has ganado el juego!!!')),
+        send(D, open)
+    ;
+        new(D, dialog('Resultado')),
+        send(D, append, label(mensaje, 'Las palabras no coinciden. Sigue intentando!!!')),
+        send(D, open)
+    ).
+
+% Predicado para comparar las listas elemento por elemento
+compare_lists([], []).
+compare_lists([H1|T1], [H2|T2]) :-
+    H1 = H2,
+    write(H1),
+    write(H2),
+    compare_lists(T1, T2).
