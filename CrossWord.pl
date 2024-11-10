@@ -2,6 +2,15 @@
 
 :- dynamic cell/1.  % Declaración dinámica para almacenar las celdas
 
+% Lista de Palabras
+palabras(['M', 'E', 'D', 'I', 'A', 'N', 
+'O', 'U', 'N', 'E', 'C', 'A', 'U', 'M', 'E', 
+'R', 'O', 'S', 'D', 'E', 'D', 'E', 'N', 'F', 
+'U', 'N', 'I', 'D', 'O', 'Y', 'E', 'N', 'T', 
+'E', 'R', 'E', 'J', 'U', 'V', 'E', 'E', 'C', 
+'J', 'U', 'E', 'V', 'S', 'M', 'R', 'C', 'A', 
+'D', 'O', 'I', 'N', 'I', 'C', 'E']).
+
 matriz([[1, 2, 3],
         [4, 5, 6],
         [7, 8, 9]]).
@@ -99,7 +108,6 @@ create_crossWord(CrossWord) :-
         create_cell(CrossWord,200,250),
         %9
         add_label(CrossWord, '9', 420, 30),
-        create_cell(CrossWord,400,50),
         create_cell(CrossWord,400,90),
         create_cell(CrossWord,400,130),
         create_cell(CrossWord,400,170),
@@ -144,7 +152,6 @@ create_crossWord(CrossWord) :-
         create_cell(CrossWord,80,170),
         create_cell(CrossWord,120,170),
         create_cell(CrossWord,160,170),
-        create_cell(CrossWord,200,170),
         create_cell(CrossWord,240,170),
         %6
         add_label(CrossWord, '6', 140, 110),
@@ -182,9 +189,34 @@ reset_cell:-
         send(Cell, selection, '')
     )).
 
-% Predicado para verificar el contenido de cada celda
+get_all_values(Values) :-
+    findall(Value, (
+        cell(Cell),
+        get(Cell, selection, Value)
+    ), Values).
+
+% Predicado para verificar si el juego esta ganado
 verificar :-
-    forall(cell(Cell), (
-        get(Cell, selection, Value),
-        format('Valor de la celda: ~w~n', [Value])
-    )).
+    get_all_values(Values),
+    writeln('Values:'), writeln(Values),
+
+    palabras(WordList),
+    writeln('WordList:'), writeln(WordList),
+    
+    (compare_lists(Values, WordList) ->
+        new(D, dialog('Felicitaciones!!!')),
+        send(D, append, label(mensaje, 'Has ganado el juego!!!')),
+        send(D, open)
+    ;
+        new(D, dialog('Resultado')),
+        send(D, append, label(mensaje, 'Las palabras no coinciden. Sigue intentando!!!')),
+        send(D, open)
+    ).
+
+% Predicado para comparar las listas elemento por elemento
+compare_lists([], []).
+compare_lists([H1|T1], [H2|T2]) :-
+    H1 = H2,
+    write(H1),
+    write(H2),
+    compare_lists(T1, T2).
